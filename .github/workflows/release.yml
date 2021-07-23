@@ -1,0 +1,32 @@
+name: release-trigger
+
+on:
+  repository_dispatch:
+    types: [release_wrapper]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: show release version
+        run: echo "released ${{ github.event.client_payload.release.version }}"
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: update version
+        shell: bash
+        run: "sed -i 's/REPO_VERSION\\:.*$/REPO_VERSION: ${{ github.event.client_payload.release.version }}/' action.yml"
+      - name: Commit & Push changes
+        uses: actions-js/push@v1.2
+        with:
+          branch: main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          message: "update REPO_VERSION to ${{ github.event.client_payload.release.version }}"
+      - name: release
+        if: github.event.client_payload.release.version != 'develop'
+        uses: ncipollo/release-action@v1.8.6
+        with:
+          tag: ${{ github.event.client_payload.release.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
