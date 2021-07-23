@@ -1,0 +1,62 @@
+name: 'node-image-workflow-generator'
+description: 'provides the templates for generating the maven based workflow'
+
+inputs:
+  token:
+    description: 'the token used to access the workflow repository'
+    required: true
+  target_folder:
+    description: 'the folder the templates are copied to'
+    required: true
+    default: 'templates'
+  tmp_folder:
+    description: 'a temporary folder used for internal processing, must not exist'
+    required: true
+    default: 'tmp_work'
+outputs:
+  workflow_version:
+    description: "the workflow version"
+    value: ${{ steps.set-output.outputs.workflow-version }}
+
+runs:
+  using: "composite"
+  steps:
+  - name: check target_folder folder
+    shell: bash
+    run:
+      if [ -d ${{ inputs.target_folder }} ]; then
+      echo "output folder ${{ inputs.target_folder }} must not exist";
+      exit 1;
+      fi;
+      
+  - name: check tmp_folder folder
+    shell: bash
+    run:
+      if [ -d ${{ inputs.tmp_folder }} ]; then
+      echo "output folder ${{ inputs.tmp_folder }} must not exist";
+      exit 1;
+      fi;
+      
+  - name: get template
+    shell: bash
+    run: 
+      git clone --depth 1 --branch $REPO_VERSION -c advice.detachedHead=false https://$GITHUB_ACTOR:$TOKEN@github.com/$REPO ${{inputs.tmp_folder}}
+    env:
+      TOKEN: ${{inputs.token}}
+      REPO: dvag/node-image-workflow-generator
+      REPO_VERSION: main
+
+  - name: copy templates
+    shell: bash
+    run: |
+      mkdir ${{ inputs.target_folder }}
+      cp ${{ inputs.tmp_folder }}/templates/* ${{ inputs.target_folder }}
+      rm -rf ${{ inputs.tmp_folder }}
+      
+  - name: set output
+    id: set-output
+    shell: bash
+    run:
+      echo "::set-output name=workflow-version::$(echo $REPO_VERSION)"
+    env:
+      REPO_VERSION: main
