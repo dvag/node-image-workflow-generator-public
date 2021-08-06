@@ -24,18 +24,22 @@ runs:
   - name: check target_folder folder
     shell: bash
     run:
-      if [ -d ${{ inputs.target_folder }} ]; then
-      echo "output folder ${{ inputs.target_folder }} must not exist";
+      if [ -d $TARGET_FOLDER ]; then
+      echo "output folder $TARGET_FOLDER must not exist";
       exit 1;
       fi;
+    env:
+      TARGET_FOLDER: ${{ inputs.target_folder }}
       
   - name: check tmp_folder folder
     shell: bash
     run:
-      if [ -d ${{ inputs.tmp_folder }} ]; then
-      echo "output folder ${{ inputs.tmp_folder }} must not exist";
+      if [ -d $TMP_FOLDER ]; then
+      echo "output folder $TMP_FOLDER must not exist";
       exit 1;
       fi;
+    env:
+      TMP_FOLDER: ${{ inputs.tmp_folder }}
       
   - name: get template
     shell: bash
@@ -49,9 +53,12 @@ runs:
   - name: copy templates
     shell: bash
     run: |
-      mkdir ${{ inputs.target_folder }}
-      cp ${{ inputs.tmp_folder }}/templates/* ${{ inputs.target_folder }}
-      rm -rf ${{ inputs.tmp_folder }}
+      mkdir $TARGET_FOLDER
+      cp $TMP_FOLDER/templates/* $TARGET_FOLDER
+      rm -rf $TMP_FOLDER
+    env:
+      TMP_FOLDER: ${{ inputs.tmp_folder }}
+      TARGET_FOLDER: ${{ inputs.target_folder }}
       
   - name: set output
     id: set-output
