@@ -5,6 +5,10 @@ inputs:
   token:
     description: 'the token used to access the workflow repository'
     required: true
+  source_folder:
+    description: 'the folder the templates are copied from'
+    required: true
+    default: 'templates'
   target_folder:
     description: 'the folder the templates are copied to'
     required: true
@@ -54,10 +58,11 @@ runs:
     shell: bash
     run: |
       mkdir $TARGET_FOLDER
-      cp $TMP_FOLDER/templates/* $TARGET_FOLDER
+      cp $TMP_FOLDER/$SOURCE_FOLDER/* $TARGET_FOLDER
       rm -rf $TMP_FOLDER
     env:
       TMP_FOLDER: ${{ inputs.tmp_folder }}
+      SOURCE_FOLDER: ${{ inputs.source_folder }}
       TARGET_FOLDER: ${{ inputs.target_folder }}
       
   - name: set output
