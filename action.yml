@@ -52,7 +52,7 @@ runs:
     env:
       TOKEN: ${{inputs.token}}
       REPO: dvag/node-image-workflow-generator
-      REPO_VERSION: v0.0.16
+      REPO_VERSION: v0.0.17
 
   - name: copy templates
     shell: bash
@@ -71,4 +71,4 @@ runs:
     run:
       echo "::set-output name=workflow-version::$(echo $REPO_VERSION)"
     env:
-      REPO_VERSION: v0.0.16
+      REPO_VERSION: v0.0.17
